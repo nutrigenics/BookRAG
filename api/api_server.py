@@ -113,6 +113,23 @@ async def chat(request: ChatRequest):
              data = full_response['data']
              if isinstance(data, dict):
                  logger.info(f"Context Data Keys: {data.keys()}")
+                 chunks = data.get("chunks", [])
+                 if len(chunks) == 0 and request.mode == "hybrid":
+                     logger.info("Hybrid mode yielded 0 chunks. Attempting backfill via Naive retrieval...")
+                     try:
+                         # Perform naive query just for context retrieval (skipping LLM generation if possible)
+                         naive_full = await rag_instance.aquery_llm(
+                             request.query, 
+                             param=QueryParam(mode="naive", stream=False, only_need_context=True)
+                         )
+                         naive_data = naive_full.get("data", {})
+                         naive_chunks = naive_data.get("chunks", [])
+                         if len(naive_chunks) > 0:
+                             logger.info(f"Backfilled {len(naive_chunks)} chunks from Naive search.")
+                             data["chunks"] = naive_chunks
+                     except Exception as e:
+                         logger.error(f"Backfill missing chunks failed: {e}")
+
                  if "chunks" in data and len(data["chunks"]) > 0:
                      logger.info(f"First Chunk Sample: {data['chunks'][0]}")
         

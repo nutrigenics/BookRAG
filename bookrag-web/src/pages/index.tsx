@@ -120,7 +120,7 @@ export default function Home() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           query: query,
-          mode: 'naive',
+          mode: 'hybrid',
           book_id: currentBookId // Send selected book ID
         }),
       });

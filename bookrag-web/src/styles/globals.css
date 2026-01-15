@@ -1,0 +1,222 @@
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/* Premium Color Palette - Deep Emerald */
+:root {
+  --font-main: 'Crimson Pro', 'Georgia', serif;
+
+  /* Background */
+  --bg-primary: #FAFBFA;
+  --bg-secondary: #F0F4F1;
+  --bg-tertiary: #E4ECE6;
+
+  /* Text */
+  --text-primary: #1A2E23;
+  --text-secondary: #3D5A4A;
+  --text-muted: #6B8577;
+
+  /* Accent - Deep Emerald */
+  --accent-primary: #2D6A4F;
+  --accent-light: #52B788;
+  --accent-dark: #1B4332;
+
+  /* Borders & Dividers */
+  --border-light: rgba(29, 78, 55, 0.08);
+  --border-medium: rgba(29, 78, 55, 0.15);
+
+  /* Shadows - Emerald tinted */
+  --shadow-sm: 0 1px 2px rgba(29, 78, 55, 0.05);
+  --shadow-md: 0 4px 12px rgba(29, 78, 55, 0.08);
+  --shadow-lg: 0 8px 24px rgba(29, 78, 55, 0.1);
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  font-size: 17px;
+  line-height: 1.7;
+  letter-spacing: 0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    opacity: 0.5;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.5;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-fade-in-scale {
+  animation: fadeInScale 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-shimmer {
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+/* Custom Scrollbar - Refined & Minimal */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--border-medium);
+  border-radius: 99px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Typography - Premium Styling */
+.prose {
+  --tw-prose-body: var(--text-primary);
+  --tw-prose-headings: var(--text-primary);
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.prose h1,
+.prose h2,
+.prose h3 {
+  font-family: var(--font-main);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-top: 1.5em;
+  margin-bottom: 0.75em;
+}
+
+.prose p {
+  margin-bottom: 1.25em;
+}
+
+.prose strong {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Premium Card Styling */
+.premium-card {
+  background: #FFFFFF;
+  border: 1px solid var(--border-light);
+  border-radius: 16px;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.premium-card:hover {
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-medium);
+}
+
+/* Button Utilities */
+.btn-primary {
+  background: var(--accent-primary);
+  color: #FFFFFF;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: var(--accent-dark);
+  box-shadow: var(--shadow-md);
+}
+
+/* Reference Chip Premium Style */
+.reference-chip {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.reference-chip:hover {
+  background: var(--bg-tertiary);
+  border-color: var(--accent-light);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Hide Next.js Dev Tools */
+[data-nextjs-toast],
+[data-nextjs-toast-errors] {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Slide-in Animation for PDF Panel */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.3s ease-out forwards;
+}
+
+/* Input Focus States */
+input:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--accent-light) !important;
+  box-shadow: 0 0 0 3px rgba(82, 183, 136, 0.15);
+}
+
+/* Selection Color */
+::selection {
+  background: rgba(82, 183, 136, 0.25);
+  color: var(--text-primary);
+}

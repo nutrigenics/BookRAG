@@ -1,0 +1,18 @@
+I have created the separate folder My_BookChat with all the necessary components!
+
+Location: /home/fahadkhan/My_BookChat
+
+Contents:
+
+Web App: bookrag-web/ (Complete UI)
+Backend: api/ (Server code)
+Index: bookrag_index_pages_LA_Geografia/ (The indexed book data)
+Scripts: run_chat_app.sh, bookrag_pipeline.py, etc.
+Config: .env and requirements_bookrag.txt
+How to run it from the new folder:
+
+Navigate to the folder: cd /home/fahadkhan/My_BookChat
+Install frontend dependencies: cd bookrag-web && npm install
+Go back: cd ..
+Run the app: ./run_chat_app.sh then cd bookrag-web && npm run dev
+It is now a standalone package!

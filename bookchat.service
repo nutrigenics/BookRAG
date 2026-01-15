@@ -1,0 +1,26 @@
+[Unit]
+Description=BookChat API Service
+After=network.target
+
+[Service]
+# User/Group: Change these to the user you created on the droplet (e.g., 'ubuntu' or 'root')
+User=root
+Group=root
+
+# Directory where you uploaded the files
+# CHANGE THIS PATH to match your actual location on the server
+WorkingDirectory=/root/My_BookChat
+
+# Command to start the app
+# CHANGE THIS PATH to match your actual location
+ExecStart=/bin/bash /root/My_BookChat/start_backend.sh
+
+# Restart automatically if it crashes
+Restart=always
+RestartSec=5
+
+# Environment variables can also be set here if not using .env file
+# Environment=OPENAI_API_KEY=your_key_here
+
+[Install]
+WantedBy=multi-user.target

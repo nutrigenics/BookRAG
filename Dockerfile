@@ -10,13 +10,16 @@ RUN pip install --no-cache-dir -r requirements_bookrag.txt
 COPY api ./api
 COPY lightrag ./lightrag
 
-# Copy Index Data (Books)
-COPY bookrag_index_pages_LA_Geografia ./bookrag_index_pages_LA_Geografia
-COPY bookrag_index_pages_tabulue_rudolphine ./bookrag_index_pages_tabulue_rudolphine
-COPY bookrag_index_pages_tractatus ./bookrag_index_pages_tractatus
+# Copy Split Data and Reassemble
+COPY bookrag_data.part_* ./
+RUN cat bookrag_data.part_* > bookrag_data.tar.gz && \
+    tar -xzf bookrag_data.tar.gz && \
+    rm bookrag_data.tar.gz bookrag_data.part_*
 
-# Expose API port
-EXPOSE 8000
+# Expose API port (Documentary only)
+EXPOSE 8080
 
 # Start command
-CMD ["uvicorn", "api.api_server:app", "--host", "0.0.0.0", "--port", "8000"]
+# Use shell form to allow variable expansion for $PORT
+# DigitalOcean App Platform defaults to port 8080 or sets $PORT
+CMD uvicorn api.api_server:app --host 0.0.0.0 --port ${PORT:-8080}

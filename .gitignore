@@ -27,3 +27,7 @@ yarn-error.log*
 
 # RAG Data / Large Indices (Generated Data)
 bookrag_index_pages_*/
+# Ignore the large tarball if it exists
+bookrag_data.tar.gz
+# DO NOT ignore the parts
+!bookrag_data.part_*

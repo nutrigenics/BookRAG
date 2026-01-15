@@ -4,7 +4,7 @@
   command = "npm run build"
 
 [context.production]
-  environment = { NODE_VERSION = "18" }
+  environment = { NODE_VERSION = "22" }
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"

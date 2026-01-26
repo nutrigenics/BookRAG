@@ -79,6 +79,18 @@ class ChatRequest(BaseModel):
     query: str
     mode: str = "hybrid" # hybrid, global, local, naive
     book_id: str = "geografia" # Default to original book
+    language: str = "English" # English or Arabic
+
+async def translate_to_english(text: str) -> str:
+    """Uses LLM to translate text to English for retrieval."""
+    try:
+        prompt = f"Translate the following text to English. Return only the translated text, without quotes or explanations.\n\nText: {text}"
+        # We can reuse the same LLM function used by LightRAG
+        response = await gpt_4o_mini_complete(prompt)
+        return response.strip()
+    except Exception as e:
+        logger.error(f"Translation failed: {e}")
+        return text # Fallback to original
 
 @app.get("/health")
 async def health_check():
@@ -94,18 +106,35 @@ async def chat(request: ChatRequest):
     rag_instance = rag_instances.get(request.book_id)
     
     if not rag_instance:
-        # Fallback? Or strict error? 
-        # For robustness, if default 'geografia' is missing but others exist, we could fallback, 
-        # but explicit error is better for debugging.
         raise HTTPException(status_code=404, detail=f"Book '{request.book_id}' not found or not initialized.")
     
     try:
-        logger.info(f"Received query: {request.query} [Book: {request.book_id}] [Mode: {request.mode}]")
+        logger.info(f"Received query: {request.query} [Book: {request.book_id}] [Mode: {request.mode}] [Lang: {request.language}]")
         
+        # 1. Cross-Lingual RAG Logic
+        query_for_retrieval = request.query
+        response_instruction = ""
+        
+        if request.language == "Arabic":
+            # Translate query to English for better retrieval against English/Latin index
+            translated_query = await translate_to_english(request.query)
+            logger.info(f"Translated Arabic query: '{request.query}' -> '{translated_query}'")
+            query_for_retrieval = translated_query
+            # Instruct LLM to answer in Arabic
+            response_instruction = "You are a helpful assistant. Please answer the user's question in Arabic language."
+        else:
+             # Default English instruction
+             response_instruction = "Please answer in English."
+
         # Enable streaming in LightRAG
+        # We pass 'user_prompt' to QueryParam which gets injected into the system prompt
         full_response = await rag_instance.aquery_llm(
-            request.query, 
-            param=QueryParam(mode=request.mode, stream=True)
+            query_for_retrieval, 
+            param=QueryParam(
+                mode=request.mode, 
+                stream=True,
+                user_prompt=response_instruction 
+            )
         )
         
         logger.info(f"LightRAG Response Keys: {full_response.keys()}")
@@ -119,7 +148,7 @@ async def chat(request: ChatRequest):
                      try:
                          # Perform naive query just for context retrieval (skipping LLM generation if possible)
                          naive_full = await rag_instance.aquery_llm(
-                             request.query, 
+                             query_for_retrieval, 
                              param=QueryParam(mode="naive", stream=False, only_need_context=True)
                          )
                          naive_data = naive_full.get("data", {})

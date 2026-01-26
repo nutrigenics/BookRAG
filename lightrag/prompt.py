@@ -252,7 +252,8 @@ Consider the conversation history if provided to maintain conversational flow an
 
 4. References Section Format:
   - The References section should be under heading: `### References`
-  - Reference list entries should adhere to the format: `* [n] Document Title`. Do not include a caret (`^`) after opening square bracket (`[`).
+  - **CRITICAL**: If the Document Chunk contains a source marker like `[SOURCE: Page N]`, you MUST use the format: `* [Page N]`. Do NOT use the reference ID [n] or the Document Title in this case.
+  - If no Page marker is present, adhere to the format: `* [n] Document Title`. Do not include a caret (`^`) after opening square bracket (`[`).
   - The Document Title in the citation must retain its original language.
   - Output each citation on an individual line
   - Provide maximum of 5 most relevant citations.
@@ -262,9 +263,8 @@ Consider the conversation history if provided to maintain conversational flow an
 ```
 ### References
 
-- [1] Document Title One
-- [2] Document Title Two
-- [3] Document Title Three
+- [Page 15]
+- [Page 32]
 ```
 
 6. Additional Instructions: {user_prompt}
@@ -306,7 +306,8 @@ Consider the conversation history if provided to maintain conversational flow an
 
 4. References Section Format:
   - The References section should be under heading: `### References`
-  - Reference list entries should adhere to the format: `* [n] Document Title`. Do not include a caret (`^`) after opening square bracket (`[`).
+  - **CRITICAL**: If the Document Chunk contains a source marker like `[SOURCE: Page N]`, you MUST use the format: `* [Page N]`. Do NOT use the reference ID [n] or the Document Title in this case.
+  - If no Page marker is present, adhere to the format: `* [n] Document Title`. Do not include a caret (`^`) after opening square bracket (`[`).
   - The Document Title in the citation must retain its original language.
   - Output each citation on an individual line
   - Provide maximum of 5 most relevant citations.
@@ -316,9 +317,8 @@ Consider the conversation history if provided to maintain conversational flow an
 ```
 ### References
 
-- [1] Document Title One
-- [2] Document Title Two
-- [3] Document Title Three
+- [Page 15]
+- [Page 32]
 ```
 
 6. Additional Instructions: {user_prompt}

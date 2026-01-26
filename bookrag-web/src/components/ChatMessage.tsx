@@ -31,6 +31,10 @@ interface ChatMessageProps {
     bookId?: string;
     userColor?: string;
     onReferenceClick?: (bookId: string, page: number) => void;
+    translations: {
+        sources: string;
+        page: string;
+    };
 }
 
 const BOOK_ASSETS: Record<string, { pdf: string }> = {
@@ -39,7 +43,7 @@ const BOOK_ASSETS: Record<string, { pdf: string }> = {
     tabulae: { pdf: "/Tabulue_Rudolphinae.pdf" }
 };
 
-export default function ChatMessage({ message, isStreaming, bookId = 'geografia', userColor = '#0d9488', onReferenceClick }: ChatMessageProps) {
+export default function ChatMessage({ message, isStreaming, bookId = 'geografia', userColor = '#0d9488', onReferenceClick, translations }: ChatMessageProps) {
     const isUser = message.role === 'user';
     const [copied, setCopied] = useState(false);
 
@@ -53,7 +57,8 @@ export default function ChatMessage({ message, isStreaming, bookId = 'geografia'
     // This looks for "References" at start of a line near the end of the message
     let displayContent = message.content;
     if (message.references && message.references.length > 0) {
-        const refRegex = /\n+(?:###\s*)?(?:References|Bibliography|Sources)(?:[:\s])[\s\S]*$/i;
+        // Updated regex to include Arabic terms
+        const refRegex = /\n+(?:###\s*)?(?:References|Bibliography|Sources|المصادر|المراجع)(?:[:\s])[\s\S]*$/i;
         displayContent = displayContent.replace(refRegex, '');
     }
 
@@ -143,10 +148,10 @@ export default function ChatMessage({ message, isStreaming, bookId = 'geografia'
                                                         <button
                                                             onClick={() => openPdf(pageNum)}
                                                             className="inline-flex items-center gap-1.5 mx-1 px-2.5 py-0.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-[11px] font-bold transition-all border border-gray-200 hover:border-gray-300 cursor-pointer align-baseline transform hover:scale-[1.02] active:scale-95 shadow-sm"
-                                                            title={`Open Page ${pageNum}`}
+                                                            title={`${translations.page} ${pageNum}`}
                                                         >
                                                             <FileText className="w-3 h-3 opacity-70" />
-                                                            Page {pageNum}
+                                                            {translations.page} {pageNum}
                                                         </button>
                                                     );
                                                 }
@@ -204,7 +209,7 @@ export default function ChatMessage({ message, isStreaming, bookId = 'geografia'
                                 {!isStreaming && message.references && message.references.filter(r => r.page !== 'Unknown' && r.page).length > 0 && (
                                     <div className="mt-6 pt-5 border-t border-gray-100">
                                         <div className="flex items-center gap-2 mb-3">
-                                            <span className="text-xs font-semibold text-gray-500 uppercase tracking-widest">Sources</span>
+                                            <span className="text-xs font-semibold text-gray-500 uppercase tracking-widest">{translations.sources}</span>
                                             <span className="text-[10px] text-gray-400">({message.references.length})</span>
                                         </div>
 
@@ -220,7 +225,7 @@ export default function ChatMessage({ message, isStreaming, bookId = 'geografia'
                                                     >
                                                         <FileText className="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
                                                         <span className="text-sm font-medium text-gray-600 group-hover:text-gray-800 transition-colors">
-                                                            Page {pageNum}
+                                                            {translations.page} {pageNum}
                                                         </span>
                                                     </button>
                                                 );

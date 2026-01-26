@@ -1,11 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&display=swap');
 
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
 /* Premium Color Palette - Deep Emerald */
 :root {
-  --font-main: 'Crimson Pro', 'Georgia', serif;
+  --font-main: 'Google Sans', serif;
+  --font-arabic: 'IBM Plex Sans Arabic', sans-serif;
 
   /* Background */
   --bg-primary: #FAFBFA;
@@ -41,6 +44,10 @@ body {
   letter-spacing: 0.01em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.font-arabic {
+  font-family: var(--font-arabic) !important;
 }
 
 /* Animations */

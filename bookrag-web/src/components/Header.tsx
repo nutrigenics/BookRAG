@@ -7,6 +7,8 @@ interface HeaderProps {
   currentBookId: string;
   onBookChange: (id: string) => void;
   onClearChat?: () => void;
+  currentLanguage: 'English' | 'Arabic';
+  onLanguageChange: (lang: 'English' | 'Arabic') => void;
 }
 
 const BOOK_TABS = [
@@ -44,7 +46,7 @@ const BOOK_TABS = [
 
 export { BOOK_TABS };
 
-export default function Header({ currentBookId, onBookChange, onClearChat }: HeaderProps) {
+export default function Header({ currentBookId, onBookChange, onClearChat, currentLanguage, onLanguageChange }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const currentBook = BOOK_TABS.find(b => b.id === currentBookId);
 
@@ -95,6 +97,14 @@ export default function Header({ currentBookId, onBookChange, onClearChat }: Hea
 
         {/* Right Section */}
         <div className="flex items-center gap-3 z-[101]">
+          {/* Language Toggle */}
+          <button
+            onClick={() => onLanguageChange(currentLanguage === 'English' ? 'Arabic' : 'English')}
+            className="flex items-center gap-1.5 text-gray-600 hover:text-gray-900 text-xs font-semibold bg-white/50 hover:bg-white/80 border border-gray-200/60 hover:border-gray-300 rounded-full px-3 py-1.5 transition-all duration-200 active:scale-95 min-w-[60px] justify-center"
+          >
+            {currentLanguage === 'English' ? 'EN' : 'عربي'}
+          </button>
+
           {/* Clear Chat Button */}
           {onClearChat && (
             <button

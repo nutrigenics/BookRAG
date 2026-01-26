@@ -8,9 +8,16 @@ interface ChatInputProps {
     loading: boolean;
     messagesLength: number;
     clearChat: () => void;
+    translations: {
+        placeholder: string;
+        send: string;
+        clear: string;
+        poweredBy: string;
+        disclaimer: string;
+    };
 }
 
-export default function ChatInput({ input, setInput, handleSubmit, loading, messagesLength, clearChat }: ChatInputProps) {
+export default function ChatInput({ input, setInput, handleSubmit, loading, messagesLength, clearChat, translations }: ChatInputProps) {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     useEffect(() => {
@@ -42,7 +49,7 @@ export default function ChatInput({ input, setInput, handleSubmit, loading, mess
                                     handleSubmit();
                                 }
                             }}
-                            placeholder="Write your question here..."
+                            placeholder={translations.placeholder}
                             className="w-full bg-transparent border-none focus:outline-none focus:ring-0 focus:border-none p-0 text-gray-700 placeholder-gray-400 text-[15px] resize-none max-h-32 overflow-y-auto leading-relaxed !outline-non outline-none"
                             disabled={loading}
                             rows={1}
@@ -55,10 +62,10 @@ export default function ChatInput({ input, setInput, handleSubmit, loading, mess
                             <button
                                 onClick={clearChat}
                                 className="flex items-center gap-1.5 px-3 py-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all text-xs font-medium border border-transparent hover:border-red-100 whitespace-nowrap"
-                                title="Clear Chat"
+                                title={translations.clear}
                             >
                                 <Trash2 className="w-4 h-4" />
-                                <span className="hidden sm:inline">Clear Chat</span>
+                                <span className="hidden sm:inline">{translations.clear}</span>
                             </button>
                         )}
 
@@ -68,7 +75,7 @@ export default function ChatInput({ input, setInput, handleSubmit, loading, mess
                             disabled={!input.trim() || loading}
                             className="flex items-center gap-2 bg-black hover:bg-gray-800 text-white px-3 py-2.5 md:px-5 rounded-[1.5rem] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md font-medium text-sm"
                         >
-                            <span className="hidden md:inline">Send</span>
+                            <span className="hidden md:inline">{translations.send}</span>
                             <Send className="w-4 h-4 md:w-3.5 md:h-3.5" />
                         </button>
                     </div>
@@ -76,10 +83,10 @@ export default function ChatInput({ input, setInput, handleSubmit, loading, mess
 
                 <div className="text-center mt-3 space-y-1">
                     <p className="text-[11px] text-gray-500 font-medium">
-                        Powered by <a href="https://www.lawa.app" target="_blank" rel="noopener noreferrer" className="text-violet-600 hover:underline">LawaAI</a>
+                        {translations.poweredBy} <a href="https://www.lawa.app" target="_blank" rel="noopener noreferrer" className="text-violet-600 hover:underline">LawaAI</a>
                     </p>
                     <p className="text-[10px] text-gray-400 font-medium tracking-wide">
-                        AI assistant can give wrong answers. Please verify information with official sources.
+                        {translations.disclaimer}
                     </p>
                 </div>
             </div>

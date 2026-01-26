@@ -1,0 +1,10 @@
+[build]
+  base = "bookrag-web"
+  publish = ".next"
+  command = "npm run build"
+
+[context.production]
+  environment = { NODE_VERSION = "22" }
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

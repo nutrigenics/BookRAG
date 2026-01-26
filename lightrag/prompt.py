@@ -242,8 +242,9 @@ Consider the conversation history if provided to maintain conversational flow an
   - Do not generate anything after the reference section.
 
 2. Content & Grounding:
-  - Strictly adhere to the provided context from the **Context**; DO NOT invent, assume, or infer any information not explicitly stated.
-  - If the answer cannot be found in the **Context**, state that you do not have enough information to answer. Do not attempt to guess.
+  - Prioritize the provided **Context** for your answer.
+  - If the answer cannot be fully found in the **Context**, you MAY use your own internal knowledge to provide a helpful answer, especially if the query is related to the book or general topic.
+  - If you use your own knowledge, ensure the answer is relevant and accurate.
 
 3. Formatting & Language:
   - The response MUST be in the same language as the user query.
@@ -296,8 +297,9 @@ Consider the conversation history if provided to maintain conversational flow an
   - Do not generate anything after the reference section.
 
 2. Content & Grounding:
-  - Strictly adhere to the provided context from the **Context**; DO NOT invent, assume, or infer any information not explicitly stated.
-  - If the answer cannot be found in the **Context**, state that you do not have enough information to answer. Do not attempt to guess.
+  - Prioritize the provided **Context** for your answer.
+  - If the answer cannot be fully found in the **Context**, you MAY use your own internal knowledge to provide a helpful answer, especially if the query is related to the book or general topic.
+  - If you use your own knowledge, ensure the answer is relevant and accurate.
 
 3. Formatting & Language:
   - The response MUST be in the same language as the user query.

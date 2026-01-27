@@ -14,7 +14,16 @@ export default function ThinkingBubble() {
 
     useEffect(() => {
         const interval = setInterval(() => {
+<<<<<<< Updated upstream
             setStep((prev) => (prev + 1) % (steps.length + 1)); // +1 to allow a "finished" state moment if needed, or just cycle
+=======
+            setStep((prev) => {
+                if (prev < steps.length - 1) {
+                    return prev + 1;
+                }
+                return prev; // Stay on the last step
+            });
+>>>>>>> Stashed changes
         }, 2500);
         return () => clearInterval(interval);
     }, [steps.length]);

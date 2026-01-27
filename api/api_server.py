@@ -124,7 +124,13 @@ async def chat(request: ChatRequest):
             response_instruction = "You are a helpful assistant. Please answer the user's question in Arabic language."
         else:
              # Default English instruction
-             response_instruction = "Please answer in English."
+             response_instruction = (
+                 "Please answer in English. Format your response for maximum readability: "
+                 "use markdown tables for comparisons or structured data, bullet points for lists, "
+                 "and bold text for key terms or emphasized points."
+             )
+        
+        logger.info(f"Response instruction: {response_instruction}")
 
         # Enable streaming in LightRAG
         # We pass 'user_prompt' to QueryParam which gets injected into the system prompt

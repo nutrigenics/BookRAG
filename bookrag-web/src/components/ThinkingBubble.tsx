@@ -1,55 +1,74 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Sparkles } from 'lucide-react';
+import { Check, Loader2, Circle } from 'lucide-react';
 import logo from '../assets/logo-square.svg';
 
 export default function ThinkingBubble() {
     const [step, setStep] = useState(0);
 
     const steps = [
-        "Analyzing request...",
-        "Consulting library...",
-        "Formulating response..."
+        "Analyzing your request...",
+        "Consulting knowledge base...",
+        "Generating comprehensive response..."
     ];
 
     useEffect(() => {
         const interval = setInterval(() => {
-            setStep((prev) => (prev + 1) % steps.length);
-        }, 1500);
+            setStep((prev) => (prev + 1) % (steps.length + 1)); // +1 to allow a "finished" state moment if needed, or just cycle
+        }, 2500);
         return () => clearInterval(interval);
     }, [steps.length]);
 
     return (
-        <div className="w-full flex justify-center py-4 text-left animate-fade-in">
-            <div className="w-full max-w-4xl flex gap-3 md:gap-5">
-                {/* Avatar Column */}
-                <div className="flex-shrink-0 pt-1">
-                    <div className="w-9 h-9 bg-white rounded-xl border border-gray-200 shadow-sm flex items-center justify-center p-0.5">
-                        <Image src={logo} alt="Bot" width={28} height={28} className="object-contain" />
+        <div className="w-full flex justify-center py-4 animate-fade-in text-left">
+            <div className="w-full max-w-4xl group/message bg-white/40 backdrop-blur-sm border border-slate-200/60 rounded-3xl p-6 md:p-8 transition-colors duration-300">
+
+                {/* Header: Logo + Title */}
+                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-200/50">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center p-0.5 bg-white/50 border border-white/50 shadow-sm">
+                        <Image src={logo} alt="Bot" width={24} height={24} className="object-contain" />
                     </div>
+                    <span className="text-sm font-bold text-slate-700 tracking-wide">
+                        LawaAI Agent
+                    </span>
                 </div>
 
-                {/* Content Column */}
-                <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 bg-gray-50/80 backdrop-blur-sm border border-gray-100 rounded-2xl px-5 py-3 w-fit shadow-sm">
+                {/* Multi-step Loading Indicator */}
+                <div className="space-y-4 max-w-lg">
+                    {steps.map((label, idx) => {
+                        const isActive = idx === step;
+                        const isCompleted = idx < step;
 
-                        {/* Animated Icon */}
-                        <div className="relative flex items-center justify-center">
-                            <div className="absolute inset-0 bg-violet-400/20 rounded-full animate-ping"></div>
-                            <Sparkles className="w-4 h-4 text-violet-600 relative z-10" />
-                        </div>
+                        return (
+                            <div key={idx} className="flex items-center gap-4 transition-all duration-300">
+                                {/* Status Icon */}
+                                <div className={`
+                                    w-6 h-6 rounded-full flex items-center justify-center border transition-all duration-300
+                                    ${isCompleted ? 'bg-[var(--accent-primary)] border-[var(--accent-primary)]' :
+                                        isActive ? 'bg-white border-[var(--accent-primary)] shadow-[0_0_10px_rgba(16,185,129,0.2)]' :
+                                            'bg-transparent border-slate-300'}
+                                `}>
+                                    {isCompleted ? (
+                                        <Check className="w-3.5 h-3.5 text-white animate-fade-in" />
+                                    ) : isActive ? (
+                                        <Loader2 className="w-3.5 h-3.5 text-[var(--accent-primary)] animate-spin" />
+                                    ) : (
+                                        <div className="w-1.5 h-1.5 rounded-full bg-slate-200" />
+                                    )}
+                                </div>
 
-                        {/* Cycling Text */}
-                        <div className="flex flex-col gap-1">
-                            <span className="text-sm font-medium text-gray-600 animate-pulse">
-                                {steps[step]}
-                            </span>
-                            {/* Subtle Progress Bar */}
-                            <div className="h-0.5 w-full bg-gray-100 rounded-full overflow-hidden mt-1">
-                                <div className="h-full bg-violet-400/50 w-full animate-[loading_2s_ease-in-out_infinite] origin-left scale-x-0"></div>
+                                {/* Text Label */}
+                                <span className={`
+                                    text-sm font-medium transition-colors duration-300
+                                    ${isCompleted ? 'text-slate-500' :
+                                        isActive ? 'text-[var(--text-primary)] font-semibold' :
+                                            'text-slate-400'}
+                                `}>
+                                    {label}
+                                </span>
                             </div>
-                        </div>
-                    </div>
+                        );
+                    })}
                 </div>
             </div>
         </div>

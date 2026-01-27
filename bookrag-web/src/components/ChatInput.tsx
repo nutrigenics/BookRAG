@@ -1,5 +1,5 @@
-import React, { useRef, useEffect } from 'react';
-import { Send, Mic, Trash2 } from 'lucide-react';
+import React, { useRef, useEffect, useState } from 'react';
+import { ArrowUp, Mic, Trash2, MicOff, Square } from 'lucide-react';
 
 interface ChatInputProps {
     input: string;
@@ -17,8 +17,68 @@ interface ChatInputProps {
     };
 }
 
+// Add types for Web Speech API
+declare global {
+    interface Window {
+        webkitSpeechRecognition: any;
+        SpeechRecognition: any;
+    }
+}
+
 export default function ChatInput({ input, setInput, handleSubmit, loading, messagesLength, clearChat, translations }: ChatInputProps) {
     const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const [isListening, setIsListening] = useState(false);
+    const recognitionRef = useRef<any>(null);
+    const inputRef = useRef(input);
+
+    // Keep inputRef consistent
+    useEffect(() => {
+        inputRef.current = input;
+    }, [input]);
+
+    // Initialize Speech Recognition
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                const recognition = new SpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = true;
+                recognition.lang = 'en-US';
+
+                recognition.onstart = () => setIsListening(true);
+                recognition.onend = () => setIsListening(false);
+
+                recognition.onresult = (event: any) => {
+                    const transcript = Array.from(event.results)
+                        .map((result: any) => result[0])
+                        .map((result) => result.transcript)
+                        .join('');
+
+                    if (event.results[0].isFinal) {
+                        const currentText = inputRef.current;
+                        const separator = currentText && !currentText.endsWith(' ') ? ' ' : '';
+                        setInput(currentText + separator + transcript);
+                    }
+                };
+
+                recognitionRef.current = recognition;
+            }
+        }
+    }, [setInput]);
+
+    const toggleVoiceInput = () => {
+        if (!recognitionRef.current) {
+            alert("Voice input is not supported in this browser.");
+            return;
+        }
+
+        if (isListening) {
+            recognitionRef.current.stop();
+        } else {
+            recognitionRef.current.start();
+        }
+    };
 
     useEffect(() => {
         if (textareaRef.current) {
@@ -27,67 +87,76 @@ export default function ChatInput({ input, setInput, handleSubmit, loading, mess
         }
     }, [input]);
 
-    return (
-        <div className="flex-none p-3 md:p-3 pb-4 md:pb-8 z-20">
-            <div className="max-w-2xl mx-auto w-full">
-                <div className="relative flex items-center gap-2 md:gap-3 bg-white rounded-[2rem] shadow-lg px-2 py-1 transition-shadow duration-300 hover:shadow-xl">
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            handleSubmit();
+        }
+    };
 
-                    {/* Mic Button (Left) */}
-                    <button className="flex-none p-2 md:p-3 text-gray-400 hover:text-indigo-600 bg-gray-50 hover:bg-indigo-50 rounded-full transition-all duration-200 group mb-1" title="Voice Input">
-                        <Mic className="w-4 h-4 md:w-5 md:h-5 group-hover:scale-110 transition-transform" />
-                    </button>
+    return (
+        <div className="flex-none p-3 md:p-3 z-20">
+            <div className="max-w-2xl mx-auto w-full">
+                <div className="relative flex flex-col items-center gap-2 md:gap-3 rounded-3xl px-2 py-1 border border-[var(--border-light)] bg-white/90 backdrop-blur-3xl transition-all duration-300 outline outline-2 outline-offset-4 outline-[var(--border-light)] focus-within:border-[var(--accent-primary)]/50 focus-within:outline-[var(--accent-primary)]/50 shadow-sm focus-within:shadow-md">
 
                     {/* Text Input */}
-                    <div className="flex-1 min-w-0 flex items-center">
+                    <div className="w-full min-w-0 flex items-center p-3">
                         <textarea
                             ref={textareaRef}
                             value={input}
                             onChange={(e) => setInput(e.target.value)}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter' && !e.shiftKey) {
-                                    e.preventDefault();
-                                    handleSubmit();
-                                }
-                            }}
-                            placeholder={translations.placeholder}
-                            className="w-full bg-transparent border-none focus:outline-none focus:ring-0 focus:border-none p-0 text-gray-700 placeholder-gray-400 text-[15px] resize-none max-h-32 overflow-y-auto leading-relaxed !outline-non outline-none"
+                            onKeyDown={handleKeyDown}
+                            placeholder={isListening ? "Listening..." : translations.placeholder}
+                            className="w-full bg-transparent border-none focus:outline-none focus:ring-0 focus:border-none p-0 text-[var(--text-primary)] placeholder-[var(--text-muted)] text-[15px] resize-none max-h-32 overflow-y-auto leading-relaxed"
                             disabled={loading}
                             rows={1}
                         />
                     </div>
 
-                    {/* Right Actions */}
-                    <div className="flex items-center gap-2">
-                        {messagesLength > 0 && (
+                    <div className="w-full flex items-center justify-between pb-1 px-1">
+                        {/* Mic Button (Left) */}
+                        <button
+                            onClick={toggleVoiceInput}
+                            className={`flex-none p-2 rounded-full transition-all duration-300 group relative border border-[var(--border-light)]
+                                ${isListening
+                                    ? 'text-red-500 bg-red-50 animate-ripple'
+                                    : 'text-[var(--text-muted)] hover:text-[var(--accent-primary)] bg-[var(--bg-secondary)] hover:bg-[var(--bg-tertiary)]'
+                                }
+                            `}
+                            title="Voice Input"
+                        >
+                            {isListening ? (
+                                <MicOff className="w-4 h-4 relative z-10" />
+                            ) : (
+                                <Mic className="w-4 h-4 group-hover:scale-110 transition-transform relative z-10" />
+                            )}
+                        </button>
+
+
+                        {/* Right Actions */}
+                        <div className="flex gap-2">
                             <button
                                 onClick={clearChat}
-                                className="flex items-center gap-1.5 px-3 py-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all text-xs font-medium border border-transparent hover:border-red-100 whitespace-nowrap"
+                                className="flex items-center gap-2 px-3 py-1.5 text-[var(--text-muted)] hover:text-red-600 bg-[var(--bg-secondary)] hover:bg-red-50 border border-[var(--border-light)] hover:border-red-200 rounded-full transition-all text-xs font-medium"
                                 title={translations.clear}
                             >
-                                <Trash2 className="w-4 h-4" />
+                                <Trash2 className="w-3.5 h-3.5" />
                                 <span className="hidden sm:inline">{translations.clear}</span>
                             </button>
-                        )}
 
-
-                        <button
-                            onClick={() => handleSubmit()}
-                            disabled={!input.trim() || loading}
-                            className="flex items-center gap-2 bg-black hover:bg-gray-800 text-white px-3 py-2.5 md:px-5 rounded-[1.5rem] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md font-medium text-sm"
-                        >
-                            <span className="hidden md:inline">{translations.send}</span>
-                            <Send className="w-4 h-4 md:w-3.5 md:h-3.5" />
-                        </button>
+                            <button
+                                onClick={() => handleSubmit()}
+                                disabled={!input.trim() || loading}
+                                className="flex items-center justify-center bg-[var(--accent-primary)] hover:bg-[var(--accent-dark)] text-white w-9 h-9 rounded-full transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg hover:scale-105 active:scale-95"
+                            >
+                                {loading ? (
+                                    <Square className="w-3 h-3 animate-pulse fill-current" />
+                                ) : (
+                                    <ArrowUp className="w-5 h-5" />
+                                )}
+                            </button>
+                        </div>
                     </div>
-                </div>
-
-                <div className="text-center mt-3 space-y-1">
-                    <p className="text-[11px] text-gray-500 font-medium">
-                        {translations.poweredBy} <a href="https://www.lawa.app" target="_blank" rel="noopener noreferrer" className="text-violet-600 hover:underline">LawaAI</a>
-                    </p>
-                    <p className="text-[10px] text-gray-400 font-medium tracking-wide">
-                        {translations.disclaimer}
-                    </p>
                 </div>
             </div>
         </div>

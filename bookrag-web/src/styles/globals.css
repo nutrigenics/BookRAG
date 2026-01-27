@@ -5,50 +5,256 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
-/* Premium Color Palette - Deep Emerald */
-:root {
-  --font-main: 'Google Sans', serif;
-  --font-arabic: 'IBM Plex Sans Arabic', sans-serif;
-
-  /* Background */
-  --bg-primary: #FAFBFA;
-  --bg-secondary: #F0F4F1;
-  --bg-tertiary: #E4ECE6;
-
-  /* Text */
-  --text-primary: #1A2E23;
-  --text-secondary: #3D5A4A;
-  --text-muted: #6B8577;
-
-  /* Accent - Deep Emerald */
-  --accent-primary: #2D6A4F;
-  --accent-light: #52B788;
-  --accent-dark: #1B4332;
-
-  /* Borders & Dividers */
-  --border-light: rgba(29, 78, 55, 0.08);
-  --border-medium: rgba(29, 78, 55, 0.15);
-
-  /* Shadows - Emerald tinted */
-  --shadow-sm: 0 1px 2px rgba(29, 78, 55, 0.05);
-  --shadow-md: 0 4px 12px rgba(29, 78, 55, 0.08);
-  --shadow-lg: 0 8px 24px rgba(29, 78, 55, 0.1);
+@theme {
+  --font-sans: var(--font-main);
+  --font-heading: var(--font-heading);
+  --font-arabic: var(--font-arabic);
 }
 
+html,
+body {
+  height: 100%;
+  overscroll-behavior: none;
+  /* Prevent elastic scrolling */
+}
+
+/* Default Root (Base) */
+:root {
+  /* Fonts */
+  --font-main: "Google Sans", system-ui, -apple-system, sans-serif;
+  --font-heading: "Google Sans", system-ui, -apple-system, sans-serif;
+  --font-arabic: "Cairo", "Amiri", serif;
+  /* Fallbacks */
+  --bg-primary: #FAFBFA;
+  --text-primary: #1A2E23;
+  --accent-primary: #2D6A4F;
+}
+
+/* =========================================
+   THEME: NATURE (La Geografia)
+   Vibe: Vibrant, Mint, Organic, Light
+   ========================================= */
+.theme-nature {
+  --bg-primary: #F7FFF9;
+  /* Mint Mist */
+  --bg-secondary: #ECFDF5;
+  --bg-tertiary: #D1FAE5;
+
+  --text-primary: #064E3B;
+  /* Deep Emerald */
+  --text-secondary: #065F46;
+  --text-muted: #10B981;
+
+  --accent-primary: #059669;
+  /* Emerald */
+  --accent-light: #34D399;
+  --accent-dark: #064E3B;
+
+  --border-light: rgba(5, 150, 105, 0.1);
+  --border-medium: rgba(5, 150, 105, 0.2);
+
+  --shadow-color: 5, 150, 105;
+  --glass-border: 1px solid rgba(16, 185, 129, 0.1);
+}
+
+.theme-nature .premium-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(16, 185, 129, 0.15);
+  box-shadow: 0 4px 20px -2px rgba(5, 150, 105, 0.1);
+}
+
+/* =========================================
+   THEME: GLASS (Tractatus)
+   Vibe: Ethereal, Pure Violet, Crystal
+   ========================================= */
+.theme-glass {
+  --bg-primary: #FCFBFF;
+  /* Crystal White */
+  --bg-secondary: #F5F3FF;
+  --bg-tertiary: #EDE9FE;
+
+  --text-primary: #2E1065;
+  /* Deep Indigo */
+  --text-secondary: #4C1D95;
+  --text-muted: #8B5CF6;
+
+  --accent-primary: #7C3AED;
+  /* Violet */
+  --accent-light: #A78BFA;
+  --accent-dark: #5B21B6;
+
+  --border-light: rgba(124, 58, 237, 0.1);
+  --border-medium: rgba(124, 58, 237, 0.2);
+
+  --shadow-color: 124, 58, 237;
+  --glass-border: 1px solid rgba(139, 92, 246, 0.15);
+}
+
+.theme-glass .premium-card {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow:
+    0 4px 12px rgba(124, 58, 237, 0.08),
+    0 0 0 1px rgba(124, 58, 237, 0.05);
+}
+
+/* =========================================
+   THEME: COSMIC (Tabulae)
+   Vibe: Radiant, Light Amber, Solar
+   ========================================= */
+.theme-cosmic {
+  --bg-primary: #FFF9F2;
+  /* Solar Shell */
+  --bg-secondary: #FEF3E2;
+  --bg-tertiary: #FDF1DB;
+
+  --text-primary: #78350F;
+  /* Deep Autumn Brown */
+  --text-secondary: #92400E;
+  --text-muted: #B45309;
+
+  --accent-primary: #D97706;
+  /* Amber */
+  --accent-light: #F59E0B;
+  --accent-dark: #B45309;
+
+  --border-light: rgba(217, 119, 6, 0.15);
+  --border-medium: rgba(217, 119, 6, 0.3);
+
+  --shadow-color: 217, 119, 6;
+  --glass-border: 1px solid rgba(217, 119, 6, 0.2);
+}
+
+.theme-cosmic body {
+  background-image:
+    linear-gradient(rgba(217, 119, 6, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(217, 119, 6, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.theme-cosmic .premium-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(217, 119, 6, 0.2);
+  box-shadow: 0 4px 20px rgba(217, 119, 6, 0.1);
+}
+
+@keyframes flow {
+  0% {
+    transform: translate(0, 0);
+  }
+
+  50% {
+    transform: translate(-5px, -5px);
+  }
+
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-flow {
+  animation: flow 8s ease-in-out infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 10s linear infinite;
+}
+
+@keyframes liquid-flow {
+  0% {
+    background-position: 0% 0%;
+  }
+
+  100% {
+    background-position: 200% 100%;
+  }
+}
+
+@keyframes nebula-pulse {
+
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+}
+
+.planet-lighting {
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4) 0%, transparent 60%, rgba(0, 0, 0, 0.5) 100%);
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  pointer-events: none;
+}
+
+.animate-liquid-fast {
+  background-size: 200% 200%;
+  animation: liquid-flow 15s linear infinite;
+}
+
+.animate-nebula {
+  animation: nebula-pulse 8s ease-in-out infinite;
+}
+
+@keyframes circle-motion {
+  0% {
+    transform: translate(0, 0);
+  }
+
+  25% {
+    transform: translate(4px, 4px);
+  }
+
+  50% {
+    transform: translate(0, 8px);
+  }
+
+  75% {
+    transform: translate(-4px, 4px);
+  }
+
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+.animate-circle-motion {
+  animation: circle-motion 4s ease-in-out infinite;
+}
+
+/* Reset Body default to ensure variables work */
 body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
   font-family: var(--font-main);
   font-size: 17px;
   line-height: 1.7;
-  letter-spacing: 0.01em;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.5s ease, color 0.5s ease;
 }
 
 .font-arabic {
   font-family: var(--font-arabic) !important;
 }
+
+/* ... Animations ... */
 
 /* Animations */
 @keyframes fadeIn {
@@ -214,16 +420,145 @@ body {
   animation: slideInRight 0.3s ease-out forwards;
 }
 
-/* Input Focus States */
+/* Input Focus States - Removed to allow component-level control */
 input:focus,
 textarea:focus {
   outline: none;
-  border-color: var(--accent-light) !important;
-  box-shadow: 0 0 0 3px rgba(82, 183, 136, 0.15);
 }
 
-/* Selection Color */
-::selection {
-  background: rgba(82, 183, 136, 0.25);
-  color: var(--text-primary);
+/* ... Input Focus States ... */
+
+/* Float Animations for Glow Orbs */
+@keyframes float {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+
+  33% {
+    transform: translate(30px, -50px) rotate(10deg);
+  }
+
+  66% {
+    transform: translate(-20px, 20px) rotate(-5deg);
+  }
+
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+}
+
+@keyframes float-reverse {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+
+  33% {
+    transform: translate(-30px, 50px) rotate(-10deg);
+  }
+
+  66% {
+    transform: translate(20px, -20px) rotate(5deg);
+  }
+
+  100% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+}
+
+.animate-float-slow {
+  animation: float 20s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float-reverse 25s ease-in-out infinite reverse;
+}
+
+.animate-float-reverse {
+  animation: float 18s ease-in-out infinite reverse;
+}
+
+/* Slow Pan Animation for Backgrounds */
+@keyframes slowPan {
+  0% {
+    transform: scale(1.1) translate(0, 0);
+  }
+
+  25% {
+    transform: scale(1.1) translate(1%, 1%);
+  }
+
+  50% {
+    transform: scale(1.1) translate(0, 2%);
+  }
+
+  75% {
+    transform: scale(1.1) translate(-1%, 1%);
+  }
+
+  100% {
+    transform: scale(1.1) translate(0, 0);
+  }
+}
+
+.animate-slow-pan {
+  animation: slowPan 60s ease-in-out infinite alternate;
+}
+
+/* Background Text Animations */
+@keyframes slideText {
+  0% {
+    transform: translateX(-5%) translateY(0) rotate(-2deg);
+  }
+
+  50% {
+    transform: translateX(5%) translateY(2%) rotate(0deg);
+  }
+
+  100% {
+    transform: translateX(-5%) translateY(0) rotate(-2deg);
+  }
+}
+
+@keyframes slideTextSlow {
+  0% {
+    transform: translateX(5%) translateY(0) rotate(1deg);
+  }
+
+  50% {
+    transform: translateX(-5%) translateY(-2%) rotate(-1deg);
+  }
+
+  100% {
+    transform: translateX(5%) translateY(0) rotate(1deg);
+  }
+}
+
+.animate-slide-text {
+  animation: slideText 40s ease-in-out infinite;
+}
+
+.animate-slide-text-slow {
+  animation: slideTextSlow 50s ease-in-out infinite;
+}
+
+/* Voice Input Animation */
+@keyframes ripple {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  }
+
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+  }
+
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
+.animate-ripple {
+  animation: ripple 1.5s infinite;
 }

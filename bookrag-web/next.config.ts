@@ -7,6 +7,16 @@ const nextConfig: NextConfig = {
   // modifying this list will require a server restart
   allowedDevOrigins: ["localhost:3000"],
   devIndicators: false,
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'upload.wikimedia.org',
+        port: '',
+        pathname: '/**',
+      },
+    ],
+  },
 };
 
 export default nextConfig;

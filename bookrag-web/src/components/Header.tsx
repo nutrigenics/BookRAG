@@ -2,12 +2,26 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { Globe, Brain, Sparkles, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
 import logo from '../assets/mbzuai_logo.png';
+import orb1 from '../assets/planet-orb-1.png';
+import orb2 from '../assets/planet-orb-2.png';
+import orb3 from '../assets/planet-orb-3.png';
 
 interface HeaderProps {
   currentBookId: string;
   onBookChange: (id: string) => void;
   onClearChat?: () => void;
+  currentLanguage: 'English' | 'Arabic';
+  onLanguageChange: (lang: 'English' | 'Arabic') => void;
 }
+
+const getOrbImage = (id: string) => {
+  switch (id) {
+    case 'geografia': return orb1;
+    case 'tractatus': return orb2;
+    case 'tabulae': return orb3;
+    default: return orb1;
+  }
+};
 
 const BOOK_TABS = [
   {
@@ -44,13 +58,15 @@ const BOOK_TABS = [
 
 export { BOOK_TABS };
 
-export default function Header({ currentBookId, onBookChange, onClearChat }: HeaderProps) {
+export default function Header({ currentBookId, onBookChange, onClearChat, currentLanguage, onLanguageChange }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
+  const [isBookMenuOpen, setIsBookMenuOpen] = useState(false); // New state for book dropdown
   const currentBook = BOOK_TABS.find(b => b.id === currentBookId);
 
   return (
     <>
-      <header className="relative flex-none bg-transparent px-4 md:px-6 py-3 flex items-center justify-between sticky top-0 z-[100] transition-all duration-300">
+      <header className="relative flex-none bg-transparent px-4 md:px-6 py-4 flex items-center justify-between sticky top-0 z-[100]">
 
         {/* Left: Logo */}
         <div className="flex items-center gap-3 z-[101]">
@@ -58,104 +74,115 @@ export default function Header({ currentBookId, onBookChange, onClearChat }: Hea
             <Image
               src={logo}
               alt="MBZUAI Logo"
-              width={140}
-              height={50}
               className="object-contain drop-shadow-sm h-full w-auto"
               priority
             />
           </div>
         </div>
 
-        {/* Desktop: Center Tabs */}
-        <div className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <div className="flex items-center gap-2">
-            {BOOK_TABS.map((book) => {
-              const Icon = book.icon;
-              const isActive = currentBookId === book.id;
-
-              return (
-                <button
-                  key={book.id}
-                  onClick={() => onBookChange(book.id)}
-                  className={`
-                  flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ease-in-out border
-                  ${isActive
-                      ? `${book.bg} ${book.color} ${book.border} shadow-sm scale-105`
-                      : `bg-transparent text-gray-500 border-transparent ${book.hover} hover:text-gray-900`
-                    }
-                `}
-                >
-                  <Icon className={`w-4 h-4 ${isActive ? book.color : 'text-gray-400 group-hover:text-gray-600'}`} />
-                  <span>{book.title}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Right Section */}
-        <div className="flex items-center gap-3 z-[101]">
-          {/* Clear Chat Button */}
-          {onClearChat && (
+        {/* Center: Book Switcher */}
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-[101]">
+          {/* Book Switcher - Dropdown */}
+          <div className="relative">
             <button
-              onClick={onClearChat}
-              className="flex items-center gap-1.5 text-gray-500 hover:text-gray-700 text-xs font-medium bg-white/50 hover:bg-white/80 border border-gray-200/60 hover:border-gray-300 rounded-full px-3 py-1.5 transition-all duration-200 active:scale-95"
-              title="Clear chat"
+              onClick={() => setIsBookMenuOpen(!isBookMenuOpen)}
+              className="group flex items-center gap-2 ps-1.5 pe-4 py-1.5 h-11 bg-white/80 backdrop-blur-sm border border-slate-300 rounded-full hover:border-slate-300 hover:shadow-md transition-all duration-300"
             >
-              <Trash2 className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Clear</span>
+              {/* Orb Circle */}
+              <div className="w-8 h-8 rounded-full overflow-hidden relative border border-slate-100 shadow-sm group-hover:scale-110 transition-transform duration-300">
+                <Image
+                  src={getOrbImage(currentBookId)}
+                  alt={currentBook?.title || 'Book'}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+
+              {/* Text */}
+              <span className="text-sm font-semibold text-slate-700 group-hover:text-slate-900 max-w-[120px] truncate hidden md:block">
+                {currentBook?.title}
+              </span>
+
+              {/* Chevron */}
+              <ChevronDown className={`w-3 h-3 text-slate-400 transition-transform duration-300 ${isBookMenuOpen ? 'rotate-180' : ''}`} />
             </button>
-          )}
 
-          {/* Mobile: Book Selector Button */}
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden flex items-center gap-2 pl-3 pr-2 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium text-gray-800 transition-all border border-gray-200"
-          >
-            <span className="truncate max-w-[120px]">{currentBook?.title || 'Select Book'}</span>
-            {isMobileMenuOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-          </button>
-        </div>
-      </header>
-
-      {/* Mobile Dropdown Menu */}
-      {isMobileMenuOpen && (
-        <>
-          {/* Backdrop */}
-          <div
-            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[90] md:hidden"
-            onClick={() => setIsMobileMenuOpen(false)}
-          />
-          {/* Menu Dropdown */}
-          <div className="absolute top-[60px] right-4 left-4 bg-white rounded-2xl shadow-xl border border-gray-100 p-2 z-[100] md:hidden animate-in fade-in slide-in-from-top-5 duration-200">
-            <div className="flex flex-col gap-1">
-              {BOOK_TABS.map((book) => {
-                const Icon = book.icon;
-                const isActive = currentBookId === book.id;
-                return (
+            {/* Book Dropdown Menu */}
+            {isBookMenuOpen && (
+              <div className="absolute top-full start-1/2 -translate-x-1/2 mt-2 w-64 bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden py-1 animate-in fade-in zoom-in-95 duration-200">
+                {BOOK_TABS.map((book) => (
                   <button
                     key={book.id}
-                    onClick={() => {
-                      onBookChange(book.id);
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className={`
-                      w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all
-                      ${isActive
-                        ? `${book.bg} ${book.color} border border-${book.border} shadow-sm`
-                        : 'text-gray-600 hover:bg-gray-50'
-                      }
-                    `}
+                    onClick={() => { onBookChange(book.id); setIsBookMenuOpen(false); }}
+                    className={`w-full text-left px-3 py-2 text-sm hover:bg-slate-50 transition-colors flex items-center gap-3 ${currentBookId === book.id ? 'bg-slate-50' : ''}`}
                   >
-                    <Icon className={`w-5 h-5 ${isActive ? book.color : 'text-gray-400'}`} />
-                    <span>{book.title}</span>
+                    <div className={`w-8 h-8 rounded-full overflow-hidden relative border ${currentBookId === book.id ? 'border-slate-400' : 'border-slate-100'}`}>
+                      <Image
+                        src={getOrbImage(book.id)}
+                        alt={book.title}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <span className={`flex-1 ${currentBookId === book.id ? 'font-bold text-slate-900' : 'text-slate-600'}`}>
+                      {book.title}
+                    </span>
+                    {currentBookId === book.id && <div className="w-1.5 h-1.5 rounded-full bg-slate-900" />}
                   </button>
-                );
-              })}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
-        </>
-      )}
+        </div>
+
+        {/* Right: Language Switcher */}
+        <div className="flex items-center gap-3 z-[101]">
+          {/* Language Switcher - Pill Style */}
+          <div className="relative w-34">
+            <button
+              onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
+              className="group flex items-center justify-between ps-1.5 pe-4 py-1.5 h-11 w-full bg-white/80 backdrop-blur-sm border border-slate-300 rounded-full hover:border-slate-300 hover:shadow-md transition-all duration-300"
+            >
+              <div className="flex items-center gap-2">
+                {/* Icon Circle */}
+                <div
+                  className="w-8 h-8 rounded-full text-white flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300"
+                  style={{ backgroundColor: currentBook?.bgColor || '#0d9488' }}
+                >
+                  <Globe className="w-4 h-4" />
+                </div>
+
+                {/* Text */}
+                <span className="text-sm font-semibold text-slate-700 group-hover:text-slate-900 hidden md:block">
+                  {currentLanguage === 'English' ? 'English' : 'العربية'}
+                </span>
+              </div>
+
+              {/* Chevron */}
+              <ChevronDown className={`w-3 h-3 text-slate-400 transition-transform duration-300 ${isLangMenuOpen ? 'rotate-180' : ''}`} />
+            </button>
+
+            {/* Dropdown Menu */}
+            {isLangMenuOpen && (
+              <div className="absolute top-full end-0 mt-2 w-full bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden py-1 animate-in fade-in zoom-in-95 duration-200">
+                <button
+                  onClick={() => { onLanguageChange('English'); setIsLangMenuOpen(false); }}
+                  className={`w-full text-left px-4 py-2 text-sm hover:bg-slate-50 transition-colors ${currentLanguage === 'English' ? 'font-bold text-slate-900 bg-slate-50' : 'text-slate-600'}`}
+                >
+                  English
+                </button>
+                <button
+                  onClick={() => { onLanguageChange('Arabic'); setIsLangMenuOpen(false); }}
+                  className={`w-full text-left px-4 py-2 text-sm hover:bg-slate-50 transition-colors ${currentLanguage === 'Arabic' ? 'font-bold text-slate-900 bg-slate-50' : 'text-slate-600'}`}
+                >
+                  العربية
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+      </header>
     </>
   );
 }

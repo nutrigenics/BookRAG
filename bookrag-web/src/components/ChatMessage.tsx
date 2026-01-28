@@ -14,16 +14,7 @@ const PdfPreview = dynamic(() => import('./PdfPreview'), {
     loading: () => <div className="mt-4 text-xs text-[var(--text-muted)]">Loading document preview...</div>
 });
 
-interface Reference {
-    page: string;
-    text: string;
-}
-
-interface Message {
-    role: 'user' | 'assistant';
-    content: string;
-    references?: Reference[];
-}
+import { Message, Reference } from '../types';
 
 interface ChatMessageProps {
     message: Message;
@@ -91,7 +82,7 @@ export default function ChatMessage({ message, isStreaming, bookId = 'geografia'
                     <div className="w-full group/message bg-white/40 backdrop-blur-sm border border-[var(--border-light)] rounded-3xl p-6 md:p-8 hover:bg-white/60 transition-colors duration-300">
 
                         {/* Header: Logo + Title + Actions */}
-                        <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-200/50">
+                        <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-300">
                             <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 rounded-lg flex items-center justify-center p-0.5 bg-white/50 border border-white/50 shadow-sm">
                                     <Image src={logo} alt="Bot" width={24} height={24} className="object-contain" />
@@ -115,6 +106,7 @@ export default function ChatMessage({ message, isStreaming, bookId = 'geografia'
                             <ReactMarkdown
                                 remarkPlugins={[remarkGfm]}
                                 components={{
+                                    hr: ({ node, ...props }) => <hr className="my-6 border-slate-300" {...props} />,
                                     code({ node, inline, className, children, ...props }: any) {
                                         const match = /language-(\w+)/.exec(className || '');
                                         return !inline && match ? (
@@ -170,7 +162,7 @@ export default function ChatMessage({ message, isStreaming, bookId = 'geografia'
 
                             {/* References / Bibliography Section */}
                             {message.references && message.references.length > 0 && (
-                                <div className="mt-8 pt-6 border-t border-slate-200/60">
+                                <div className="mt-8 pt-6 border-t border-slate-300">
                                     <h4 className="flex items-center gap-2 text-xs font-bold text-[var(--text-muted)] mb-4 uppercase tracking-wider">
                                         <BookOpen className="w-3.5 h-3.5" />
                                         {translations.sources}

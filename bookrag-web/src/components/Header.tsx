@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { Globe, Brain, Sparkles, ChevronDown, ChevronUp, Trash2 } from 'lucide-react';
+import { Globe, ChevronDown } from 'lucide-react';
 import logo from '../assets/mbzuai_logo.png';
-import orb1 from '../assets/planet-orb-1.png';
-import orb2 from '../assets/planet-orb-2.png';
-import orb3 from '../assets/planet-orb-3.png';
+import { BOOKS_LIST } from '../config/books';
 
 interface HeaderProps {
   currentBookId: string;
@@ -14,55 +12,12 @@ interface HeaderProps {
   onLanguageChange: (lang: 'English' | 'Arabic') => void;
 }
 
-const getOrbImage = (id: string) => {
-  switch (id) {
-    case 'geografia': return orb1;
-    case 'tractatus': return orb2;
-    case 'tabulae': return orb3;
-    default: return orb1;
-  }
-};
-
-const BOOK_TABS = [
-  {
-    id: 'geografia',
-    title: 'La Geografia',
-    icon: Globe,
-    color: 'text-teal-600',
-    bgColor: '#0d9488', // teal-600
-    bg: 'bg-teal-50',
-    border: 'border-teal-200',
-    hover: 'hover:bg-teal-50'
-  },
-  {
-    id: 'tractatus',
-    title: 'Tractatus',
-    icon: Brain,
-    color: 'text-violet-600',
-    bgColor: '#7c3aed', // violet-600
-    bg: 'bg-violet-50',
-    border: 'border-violet-200',
-    hover: 'hover:bg-violet-50'
-  },
-  {
-    id: 'tabulae',
-    title: 'Tabulae Rudolphinae',
-    icon: Sparkles,
-    color: 'text-amber-600',
-    bgColor: '#d97706', // amber-600
-    bg: 'bg-amber-50',
-    border: 'border-amber-200',
-    hover: 'hover:bg-amber-50'
-  },
-];
-
-export { BOOK_TABS };
-
 export default function Header({ currentBookId, onBookChange, onClearChat, currentLanguage, onLanguageChange }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
-  const [isBookMenuOpen, setIsBookMenuOpen] = useState(false); // New state for book dropdown
-  const currentBook = BOOK_TABS.find(b => b.id === currentBookId);
+  const [isBookMenuOpen, setIsBookMenuOpen] = useState(false);
+
+  const currentBook = BOOKS_LIST.find(b => b.id === currentBookId);
 
   return (
     <>
@@ -70,7 +25,7 @@ export default function Header({ currentBookId, onBookChange, onClearChat, curre
 
         {/* Left: Logo */}
         <div className="flex items-center gap-3 z-[101]">
-          <div className="relative h-9 md:h-10 w-auto transition-transform duration-300 hover:scale-105 active:scale-95">
+          <div className="relative h-9 md:h-16 w-auto transition-transform duration-300 hover:scale-105 active:scale-95">
             <Image
               src={logo}
               alt="MBZUAI Logo"
@@ -90,12 +45,14 @@ export default function Header({ currentBookId, onBookChange, onClearChat, curre
             >
               {/* Orb Circle */}
               <div className="w-8 h-8 rounded-full overflow-hidden relative border border-slate-100 shadow-sm group-hover:scale-110 transition-transform duration-300">
-                <Image
-                  src={getOrbImage(currentBookId)}
-                  alt={currentBook?.title || 'Book'}
-                  fill
-                  className="object-cover"
-                />
+                {currentBook && (
+                  <Image
+                    src={currentBook.orbImage}
+                    alt={currentBook.title}
+                    fill
+                    className="object-cover"
+                  />
+                )}
               </div>
 
               {/* Text */}
@@ -110,7 +67,7 @@ export default function Header({ currentBookId, onBookChange, onClearChat, curre
             {/* Book Dropdown Menu */}
             {isBookMenuOpen && (
               <div className="absolute top-full start-1/2 -translate-x-1/2 mt-2 w-64 bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden py-1 animate-in fade-in zoom-in-95 duration-200">
-                {BOOK_TABS.map((book) => (
+                {BOOKS_LIST.map((book) => (
                   <button
                     key={book.id}
                     onClick={() => { onBookChange(book.id); setIsBookMenuOpen(false); }}
@@ -118,7 +75,7 @@ export default function Header({ currentBookId, onBookChange, onClearChat, curre
                   >
                     <div className={`w-8 h-8 rounded-full overflow-hidden relative border ${currentBookId === book.id ? 'border-slate-400' : 'border-slate-100'}`}>
                       <Image
-                        src={getOrbImage(book.id)}
+                        src={book.orbImage}
                         alt={book.title}
                         fill
                         className="object-cover"
@@ -147,7 +104,7 @@ export default function Header({ currentBookId, onBookChange, onClearChat, curre
                 {/* Icon Circle */}
                 <div
                   className="w-8 h-8 rounded-full text-white flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300"
-                  style={{ backgroundColor: currentBook?.bgColor || '#0d9488' }}
+                  style={{ backgroundColor: currentBook?.colors.hex || '#0d9488' }}
                 >
                   <Globe className="w-4 h-4" />
                 </div>

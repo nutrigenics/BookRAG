@@ -1,32 +1,12 @@
 import React from 'react';
 import Image from 'next/image';
-import { X, Globe, Brain, Activity } from 'lucide-react';
-import { StaticImageData } from 'next/image';
-
-// Fallback images if generation fails (using the book identifier to distinct)
-// In a real scenario, we would use the generated images.
-// For now, I will accept an imageSrc prop.
+import { X, Globe, Activity } from 'lucide-react';
+import { BookConfig } from '../config/books';
 
 interface BookDetailsModalProps {
     isOpen: boolean;
     onClose: () => void;
-    book: {
-        id: string;
-        title: string;
-        description: string;
-        visualSrc?: string | StaticImageData;
-        details?: {
-            author: string;
-            year: string;
-            genre: string;
-            language: string;
-        };
-        features?: string[];
-        significance?: string;
-        color: string;
-        bgColor: string;
-        icon: any;
-    };
+    book: BookConfig;
     t: any;
 }
 
@@ -69,7 +49,7 @@ export default function BookDetailsModal({ isOpen, onClose, book, t }: BookDetai
                                 unoptimized
                             />
                         ) : (
-                            <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: book.bgColor }}>
+                            <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: book.colors.hex }}>
                                 <book.icon className="w-32 h-32 text-white/50" />
                             </div>
                         )}
@@ -82,7 +62,7 @@ export default function BookDetailsModal({ isOpen, onClose, book, t }: BookDetai
                         <div className="space-y-4 border-b border-slate-100 pb-8">
                             {book.details && (
                                 <div className="flex flex-wrap items-center gap-3 text-sm font-semibold tracking-wide text-slate-500 uppercase">
-                                    <span className={book.color}>{book.details.genre}</span>
+                                    <span className={book.colors.text}>{book.details.genre}</span>
                                     <span>•</span>
                                     <span>{book.details.year}</span>
                                 </div>
@@ -113,8 +93,8 @@ export default function BookDetailsModal({ isOpen, onClose, book, t }: BookDetai
                                 <div className="grid md:grid-cols-2 gap-4">
                                     {book.features.map((feature, idx) => (
                                         <div key={idx} className="p-5 rounded-xl bg-white border border-slate-200 shadow-[0_2px_8px_-2px_rgba(0,0,0,0.05)] hover:border-slate-300 transition-colors">
-                                            <div className={`mb-3 w-8 h-8 rounded-full flex items-center justify-center bg-slate-50 ${book.color}`}>
-                                                <div className={`w-2 h-2 rounded-full ${book.color.replace('text-', 'bg-')}`} />
+                                            <div className={`mb-3 w-8 h-8 rounded-full flex items-center justify-center bg-slate-50 ${book.colors.text}`}>
+                                                <div className={`w-2 h-2 rounded-full ${book.colors.fill}`} />
                                             </div>
                                             <span className="text-slate-700 text-sm font-medium leading-relaxed block">{feature}</span>
                                         </div>

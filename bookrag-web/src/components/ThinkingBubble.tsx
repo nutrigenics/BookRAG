@@ -3,8 +3,14 @@ import Image from 'next/image';
 import { Check, Loader2, Circle } from 'lucide-react';
 import logo from '../assets/logo-square.svg';
 
-export default function ThinkingBubble() {
-    const [step, setStep] = useState(0);
+interface ThinkingBubbleProps {
+    currentStep?: number;
+}
+
+export default function ThinkingBubble({ currentStep }: ThinkingBubbleProps) {
+    const [internalStep, setInternalStep] = useState(0);
+
+    const step = currentStep !== undefined ? currentStep : internalStep;
 
     const steps = [
         "Analyzing your request...",
@@ -13,27 +19,25 @@ export default function ThinkingBubble() {
     ];
 
     useEffect(() => {
+        if (currentStep !== undefined) return; // Don't use interval if controlled externally
+
         const interval = setInterval(() => {
-<<<<<<< Updated upstream
-            setStep((prev) => (prev + 1) % (steps.length + 1)); // +1 to allow a "finished" state moment if needed, or just cycle
-=======
-            setStep((prev) => {
+            setInternalStep((prev) => {
                 if (prev < steps.length - 1) {
                     return prev + 1;
                 }
-                return prev; // Stay on the last step
+                return prev;
             });
->>>>>>> Stashed changes
         }, 2500);
         return () => clearInterval(interval);
-    }, [steps.length]);
+    }, [steps.length, currentStep]);
 
     return (
         <div className="w-full flex justify-center py-4 animate-fade-in text-left">
             <div className="w-full max-w-4xl group/message bg-white/40 backdrop-blur-sm border border-slate-200/60 rounded-3xl p-6 md:p-8 transition-colors duration-300">
 
                 {/* Header: Logo + Title */}
-                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-200/50">
+                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-300">
                     <div className="w-8 h-8 rounded-lg flex items-center justify-center p-0.5 bg-white/50 border border-white/50 shadow-sm">
                         <Image src={logo} alt="Bot" width={24} height={24} className="object-contain" />
                     </div>

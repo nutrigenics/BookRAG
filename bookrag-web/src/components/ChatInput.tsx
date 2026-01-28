@@ -137,7 +137,8 @@ export default function ChatInput({ input, setInput, handleSubmit, loading, mess
                         <div className="flex gap-2">
                             <button
                                 onClick={clearChat}
-                                className="flex items-center gap-2 px-3 py-1.5 text-[var(--text-muted)] hover:text-red-600 bg-[var(--bg-secondary)] hover:bg-red-50 border border-[var(--border-light)] hover:border-red-200 rounded-full transition-all text-xs font-medium"
+                                disabled={messagesLength === 0}
+                                className="flex items-center gap-2 px-3 py-1.5 text-[var(--text-muted)] hover:text-red-600 bg-[var(--bg-secondary)] hover:bg-red-50 border border-[var(--border-light)] hover:border-red-200 rounded-full transition-all text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:text-[var(--text-muted)] disabled:hover:bg-[var(--bg-secondary)] disabled:hover:border-[var(--border-light)]"
                                 title={translations.clear}
                             >
                                 <Trash2 className="w-3.5 h-3.5" />

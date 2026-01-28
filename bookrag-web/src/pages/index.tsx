@@ -1,24 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Head from 'next/head';
-import Image, { StaticImageData } from 'next/image';
+import Image from 'next/image';
 import logo from '../assets/logo-square.svg';
 import bgImage from '../assets/background.png';
-import firstBook from '../assets/first book.jpg';
-import secondBook from '../assets/second-book.png';
-import thirdBook from '../assets/third-book.jpg';
 import Header from '../components/Header';
 import ChatMessage from '../components/ChatMessage';
 import ChatInput from '../components/ChatInput';
 import ThinkingBubble from '../components/ThinkingBubble';
-import OrbNavigation from '../components/OrbNavigation';
 import dynamic from 'next/dynamic';
-import {
-  BookOpen, Globe, Mountain, Waves,
-  Compass, Ruler, Calculator, Coins,
-  Star, History, BarChart, Orbit,
-  ArrowUpRight, Plus, Info, // Added Info
-  Brain, Activity // Added Brain, Activity
-} from 'lucide-react';
+import { Info } from 'lucide-react';
+import { BOOKS } from '../config/books';
+import { TRANSLATIONS } from '../config/translations';
 
 // Dynamically import PdfViewerPanel with SSR disabled
 const PdfViewerPanel = dynamic(() => import('../components/PdfViewerPanel'), {
@@ -26,205 +18,44 @@ const PdfViewerPanel = dynamic(() => import('../components/PdfViewerPanel'), {
   loading: () => null
 });
 
-interface Reference {
-  page: string;
-  text: string;
-}
+import { useChatStream } from '../hooks/useChatStream';
 
-interface Message {
-  role: 'user' | 'assistant';
-  content: string;
-  references?: Reference[];
-}
-
-import BookDetailsModal from '../components/BookDetailsModal'; // Added Modal
+import BookDetailsModal from '../components/BookDetailsModal';
+import BlurText from '../components/BlurText';
 
 // Book Configuration Data
 // Book Configuration Data
 // Book Configuration Data
-const BOOKS_CONFIG: Record<string, {
-  id: string;
-  title: string;
-  color: string;
-  bgColor: string;
-  icon: any;
-  visualSrc: string | StaticImageData;
-  details: {
-    author: string;
-    year: string;
-    genre: string;
-    language: string;
-  };
-  description: string;
-  features: string[];
-  significance: string;
-  questions: Record<string, { text: string; label: string; icon: React.ElementType }[]>
-}> = {
-  geografia: {
-    id: 'geografia',
-    title: "Geographia",
-    color: "text-teal-600",
-    bgColor: "#0d9488",
-    icon: Globe,
-    visualSrc: firstBook,
-    details: {
-      author: "Claudius Ptolemy",
-      year: "c. 150 AD",
-      genre: "Atlas / Cartography",
-      language: "Ancient Greek"
-    },
-    description: `The *Geographia* (Geography) is a compilation of geographical coordinates and a treatise on cartography that defined the field for centuries. Written in Alexandria, it introduced the revolutionary concept of global coordinates (latitude and longitude) to map the known world. Ptolemy provided instructions for creating map projections to represent the curved Earth on a flat plane, transitioning map-making from an artistic endeavor to a mathematical discipline.`,
-    features: [
-      "Introduced the grid system of latitude and longitude.",
-      "Described map projections for the spherical Earth.",
-      "Cataloged coordinates for over 8,000 locations.",
-      "Differentiated between Geography (global) and Chorography (regional)."
-    ],
-    significance: "Lost to the West for a millennium, its rediscovery in the 15th century sparked the Renaissance in cartography, directly influencing the Age of Exploration and the maps used by Columbus.",
-    questions: {
-      English: [
-        { label: "Geography Definition", text: "How does Ptolemy define Geography versus Chorography?", icon: BookOpen },
-        { label: "Map Projections", text: "What methods does the book describe for projecting a sphere onto a plane?", icon: Globe },
-        { label: "Oikumene", text: "How does Ptolemy describe the extent of the known inhabited world (Oikumene)?", icon: Mountain },
-        { label: "Coordinate System", text: "How does the book utilize latitude and longitude to locate cities?", icon: Waves }
-      ],
-      Arabic: [
-        { label: "تعريف الجغرافيا", text: "كيف يميز بطليموس بين الجغرافيا والكوروغرافيا؟", icon: BookOpen },
-        { label: "إسقاط الخرائط", text: "ما هي الطرق التي يصفها الكتاب لإسقاط الكرة على سطح مستو؟", icon: Globe },
-        { label: "المعمورة", text: "كيف يصف بطليموس حدود العالم المسكون (المعمورة)؟", icon: Mountain },
-        { label: "نظام الإحداثيات", text: "كيف يستخدم الكتاب خطوط الطول والعرض لتحديد مواقع المدن؟", icon: Waves }
-      ]
-    }
-  },
-  tractatus: {
-    id: 'tractatus',
-    title: "Tractatus Logico-Philosophicus",
-    color: "text-violet-600",
-    bgColor: "#7c3aed",
-    icon: Brain,
-    visualSrc: secondBook,
-    details: {
-      author: "Ludwig Wittgenstein",
-      year: "1921",
-      genre: "Philosophical Logic",
-      language: "German"
-    },
-    description: `The *Tractatus Logico-Philosophicus* is the only book-length philosophical work published by Ludwig Wittgenstein during his lifetime. It aims to define the relationship between language and reality and to delimit the sphere of the sayable. The work is structured as a series of 525 hierarchically numbered assertions, famously concluding: "Whereof one cannot speak, thereof one must be silent." It presents the "picture theory" of meaning, arguing that language represents the world by mirroring the logical form of facts.`,
-    features: [
-      "Asserts that 'The world is everything that is the case.'",
-      "Presents the 'Picture Theory' of meaning.",
-      "Distinguishes between what can be said and what must be shown.",
-      "Seven main propositions numbered 1 to 7."
-    ],
-    significance: "A seminal work of 20th-century analytic philosophy, it profoundly influenced the Vienna Circle and Logical Positivism, though Wittgenstein later critiqued its conclusions.",
-    questions: {
-      English: [
-        { label: "Sphere Measurement", text: "How is the diameter of a sphere measured in Stereometry?", icon: Compass },
-        { label: "Tower Height", text: "How do you measure a tower's height from two stations?", icon: Ruler },
-        { label: "Geometric Mean", text: "How do you find the geometric mean using the instrument?", icon: Calculator },
-        { label: "Currency Conversion", text: "What rule is given for converting currencies?", icon: Coins }
-      ],
-      Arabic: [
-        { label: "قياس الكرة", text: "كيف يتم قياس قطر الكرة في علم القياس المجسم؟", icon: Compass },
-        { label: "ارتفاع البرج", text: "كيف تقيس ارتفاع برج من محطتين؟", icon: Ruler },
-        { label: "الوسط الهندسي", text: "كيف تجد الوسط الهندسي باستخدام الأداة؟", icon: Calculator },
-        { label: "تحويل العملات", text: "ما هي القاعدة المذكورة لتحويل العملات؟", icon: Coins }
-      ]
-    }
-  },
-  tabulae: {
-    id: 'tabulae',
-    title: "Tabulae Rudolphinae",
-    color: "text-amber-600",
-    bgColor: "#d97706",
-    icon: Activity,
-    visualSrc: thirdBook,
-    details: {
-      author: "Johannes Kepler",
-      year: "1627",
-      genre: "Astronomy / Star Catalog",
-      language: "Latin"
-    },
-    description: `The *Tabulae Rudolphinae* (Rudolphine Tables) is a star catalog and set of planetary tables published by Johannes Kepler in 1627, based on the observational data of Tycho Brahe. Dedicated to Emperor Rudolf II, it was the first catalog to include corrective factors for atmospheric refraction and logarithmic tables. It allowed for the calculation of planetary positions with unprecedented accuracy, providing strong support for the heliocentric model of the solar system.`,
-    features: [
-      "Based on the precise observations of Tycho Brahe.",
-      "First use of logarithms in astronomical tables.",
-      "Included corrections for atmospheric refraction.",
-      "Predicted the transit of Mercury and Venus."
-    ],
-    significance: "The tables were significantly more accurate than previous ones and served as the standard for astronomy for over a century, cementing the acceptance of the heliocentric model.",
-    questions: {
-      English: [
-        { label: "Primary Purpose", text: "What is the primary purpose of the Rudolphine Tables?", icon: Star },
-        { label: "Reinhold's Event", text: "What event does Erasmus Reinhold mention in 1415?", icon: History },
-        { label: "Brahe's Data", text: "What role did Tycho Brahe's data play in creating these tables?", icon: BarChart },
-        { label: "Planetary Positions", text: "How are the planetary positions calculated in this work?", icon: Orbit }
-      ],
-      Arabic: [
-        { label: "الغرض الأساسي", text: "ما هو الغرض الأساسي من الجداول الرودلفية؟", icon: Star },
-        { label: "حدث راينهولد", text: "ما هو الحدث الذي ذكره إيراسموس راينهولد في عام 1415؟", icon: History },
-        { label: "بيانات براهي", text: "ما هو الدور الذي لعبته بيانات تايكو براهي في إنشاء هذه الجداول؟", icon: BarChart },
-        { label: "حساب الكواكب", text: "كيف يتم حساب مواقع الكواكب في هذا العمل؟", icon: Orbit }
-      ]
-    }
-  }
-};
-
-const BOOKS_LIST = Object.entries(BOOKS_CONFIG).map(([id, config]) => ({
-  id,
-  title: config.title,
-  color: config.color
-}));
-
-// Language Configuration
-const TRANSLATIONS = {
-  English: {
-    welcome: "LawaAI BookChat",
-    askingAbout: "Asking about",
-    placeholder: "Write your question here...",
-    send: "Send",
-    clear: "Clear Chat",
-    error: "Sorry, I am unable to check the library right now. Please try again later.",
-    disclaimer: "AI assistant can give wrong answers. Please verify information with official sources.",
-    poweredBy: "Powered by",
-    sources: "Sources",
-    page: "Page"
-  },
-  Arabic: {
-    welcome: "LawaAI BookChat",
-    askingAbout: "تسأل عن",
-    placeholder: "اكتب سؤالك هنا...",
-    send: "إرسال",
-    clear: "مسح المحادثة",
-    error: "عذراً، لا يمكنني التحقق من المكتبة الآن. يرجى المحاولة لاحقاً.",
-    disclaimer: "المساعد الذكي قد يخطئ. يرجى التحقق من المصادر الرسمية.",
-    poweredBy: "مدعوم من",
-    sources: "المصادر",
-    page: "صفحة"
-  }
-};
+// Configs imported from ../config
 
 // Helper component for background image transitions - REMOVED
 // function BackgroundImage... - REMOVED
 
 export default function Home() {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
   const [currentBookId, setCurrentBookId] = useState('geografia');
   const [selectedPdfRef, setSelectedPdfRef] = useState<{ bookId: string; page: number } | null>(null);
-  const [currentLanguage, setCurrentLanguage] = useState<'English' | 'Arabic'>('English'); // Language State
-  const [isDetailsOpen, setIsDetailsOpen] = useState(false); // New State
+  const [currentLanguage, setCurrentLanguage] = useState<'English' | 'Arabic'>('English');
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const currentBook = BOOKS[currentBookId];
+  const t = TRANSLATIONS[currentLanguage];
 
-  const currentBook = BOOKS_CONFIG[currentBookId];
-  const t = TRANSLATIONS[currentLanguage]; // Start using translations
+  // Use the custom hook for Chat Logic
+  const {
+    messages,
+    input,
+    setInput,
+    loading,
+    searchStage,
+    handleSubmit,
+    clearChat
+  } = useChatStream(currentBookId, t);
 
   // Clear chat when switching books
   const handleBookChange = (id: string) => {
     setCurrentBookId(id);
-    setMessages([]);
+    clearChat();
     setSelectedPdfRef(null);
   };
 
@@ -248,132 +79,8 @@ export default function Home() {
     handleSubmit(text);
   };
 
-  const handleSubmit = async (queryOverride?: string) => {
-    const finalQuery = (typeof queryOverride === 'string' ? queryOverride : input).trim();
-    if (!finalQuery || loading) return;
-
-    const query = finalQuery;
-    setInput('');
-    setMessages(prev => [...prev, { role: 'user', content: query }]);
-    setLoading(true);
-
-    try {
-      // Use env variable or window.location.hostname
-      const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || `http://${window.location.hostname}:8000`;
-      const response = await fetch(`${apiBaseUrl}/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: query,
-          mode: 'hybrid',
-          book_id: currentBookId, // Send selected book ID
-          language: currentLanguage // Send selected language
-        }),
-      });
-
-      if (!response.ok) throw new Error('Network response was not ok');
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-
-      if (!reader) throw new Error('No reader');
-
-      const aiMsg: Message = { role: 'assistant', content: '', references: [] };
-      setMessages(prev => [...prev, aiMsg]);
-
-      // Temporary storage for retrieved chunks (Page Number -> Chunk Data)
-      const contextMap = new Map<string, string>();
-
-      let buffer = '';
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
-        buffer = lines.pop() || '';
-
-        for (const line of lines) {
-          if (!line.trim()) continue;
-          try {
-            const json = JSON.parse(line);
-
-            if (json.type === 'context') {
-              const chunks = json.data.chunks || json.data.text_chunks || [];
-              console.log('[DEBUG] Context received - chunks:', chunks.length, chunks);
 
 
-              // Store chunks in map for lookup, but DO NOT display them yet
-              chunks.forEach((c: { content?: string }) => {
-                if (!c.content) return;
-                const match = c.content.match(/\[(?:SOURCE:)?\s*Page\s*(\d+)\]/i);
-                if (match && match[1]) {
-                  contextMap.set(match[1], c.content);
-                }
-              });
-
-            } else if (json.type === 'delta') {
-              setMessages(prev => {
-                const newHistory = [...prev];
-                const idx = newHistory.length - 1;
-                const newContent = newHistory[idx].content + json.content;
-
-                newHistory[idx] = {
-                  ...newHistory[idx],
-                  content: newContent,
-                };
-
-                // Parsing Logic: Extract [Page N] from the accumulator text
-                const textRefs: Reference[] = [];
-
-                // Match [Page N] or [SOURCE: Page N]
-                const pagePattern = /\[(?:SOURCE:)?\s*Page\s*(\d+)\]/gi;
-                const matches = [...newContent.matchAll(pagePattern)];
-
-                matches.forEach(m => {
-                  const pageNum = m[1];
-                  // Look up the full text from our context map
-                  // If not found (hallucination?), we can fallback to just showing the page number or ignoring it.
-                  // Let's fallback to showing "Page N" with empty text if missing context, 
-                  // BUT per requirement we should only extract what we have. 
-                  // Actually, if it's in the text, it's cited.
-                  const fullText = contextMap.get(pageNum) || `Page ${pageNum}`;
-
-                  textRefs.push({
-                    page: pageNum,
-                    text: fullText
-                  });
-                });
-
-                // Deduplicate by PAGE NUMBER
-                const uniqueTextRefs = textRefs.filter((ref, index, self) =>
-                  index === self.findIndex((r) => r.page === ref.page)
-                );
-
-                // Update references ONLY from text extraction
-                if (uniqueTextRefs.length > 0) {
-                  newHistory[idx].references = uniqueTextRefs;
-                }
-
-                return newHistory;
-              });
-            }
-          } catch (err) {
-            console.error("Error parsing JSON chunk", err);
-          }
-        }
-      }
-
-    } catch (error) {
-      console.error("Error communicating with backend:", error);
-      setMessages(prev => [...prev, { role: 'assistant', content: t.error }]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const clearChat = () => {
-    setMessages([]);
-  };
 
   // Determine Theme Class
   const getThemeClass = () => {
@@ -472,22 +179,26 @@ export default function Home() {
         <div className="flex-1 flex flex-col relative overflow-hidden">
           {messages.length === 0 ? (
             /* -- HERO STATE -- */
-            <div className="flex-1 flex flex-col items-center justify-center w-full max-w-3xl mx-auto px-4 animate-fade-in relative">
+            <div key={currentBookId} className="flex-1 flex flex-col items-center justify-center w-full max-w-3xl mx-auto px-4 relative">
               {/* Logo & Text - Added white glow/bg for readability on image */}
               <div className="flex flex-col items-center mb-4">
-                <div className="relative bg-white/80 backdrop-blur-md p-2 rounded-3xl mb-6 shadow-sm border border-white/50">
-                  <Image src={logo} alt="MBZUAI Logo" width={80} height={80} className="object-contain" priority />
+                <div className="relative bg-white/80 backdrop-blur-md p-2 rounded-3xl mb-6 shadow-sm border border-white/50 animate-fade-in-up">
+                  <Image src={logo} alt="MBZUAI Logo" width={70} height={70} className="object-contain" priority />
                 </div>
-                <h2 className="text-4xl md:text-5xl font-bold text-slate-900 tracking-tight text-center mb-2 drop-shadow-sm">
-                  {t.welcome}
-                </h2>
-                <p className="text-slate-600 font-medium text-lg text-center backdrop-blur-sm bg-white/30 px-4 py-1 rounded-full">
-                  {t.askingAbout} <span className={`${currentBook.color} font-bold`}>{currentBook.title}</span>
+                <BlurText
+                  text={t.welcome}
+                  delay={150}
+                  animateBy="words"
+                  direction="top"
+                  className="text-5xl md:text-7xl font-bold text-slate-900 tracking-tight text-center mb-2 drop-shadow-sm justify-center"
+                />
+                <p className="text-slate-600 font-medium text-lg text-center backdrop-blur-sm bg-white/30 px-4 py-1 rounded-full animate-fade-in-up delay-200">
+                  {t.askingAbout} <span className={`${currentBook.colors.text} font-bold`}>{currentBook.title}</span>
                 </p>
               </div>
 
               {/* Input */}
-              <div className="w-full">
+              <div className="w-full animate-fade-in-up delay-300">
                 <ChatInput
                   input={input}
                   setInput={setInput}
@@ -500,15 +211,11 @@ export default function Home() {
               </div>
 
               {/* Suggestions */}
-              <div className="w-full overflow-x-auto pb-4 md:pb-0 scrollbar-none snap-x flex justify-start md:justify-center py-2">
+              <div className="w-full overflow-x-auto pb-4 md:pb-0 scrollbar-none snap-x flex justify-start md:justify-center py-2 animate-fade-in-up delay-500">
                 <div className="flex flex-nowrap md:flex-wrap gap-3 w-max md:w-full md:justify-center px-1">
                   {currentBook.questions[currentLanguage].map((s, i) => {
-                    const iconBgColor = currentBookId === 'geografia' ? 'bg-teal-600' :
-                      currentBookId === 'tractatus' ? 'bg-violet-600' : 'bg-amber-600';
-
-                    const borderColor = currentBookId === 'geografia' ? 'border-teal-100 hover:border-teal-300' :
-                      currentBookId === 'tractatus' ? 'border-violet-100 hover:border-violet-300' :
-                        'border-amber-100 hover:border-amber-300';
+                    const iconBgColor = currentBook.colors.fill;
+                    const borderColor = currentBook.colors.border;
 
                     return (
                       <button
@@ -548,13 +255,13 @@ export default function Home() {
                       message={msg}
                       isStreaming={loading && idx === messages.length - 1 && msg.role === 'assistant'}
                       bookId={currentBookId}
-                      userColor={currentBookId === 'geografia' ? '#0d9488' : currentBookId === 'tractatus' ? '#7c3aed' : '#d97706'}
+                      userColor={currentBook.colors.hex}
                       onReferenceClick={handleReferenceClick}
                       translations={t}
                     />
                   ))}
                   {loading && messages[messages.length - 1].role === 'user' && (
-                    <ThinkingBubble />
+                    <ThinkingBubble currentStep={searchStage} />
                   )}
                   <div ref={messagesEndRef} />
                 </div>
@@ -607,15 +314,11 @@ export default function Home() {
 
       {/* PDF Viewer Panel Overlay */}
       {selectedPdfRef && (
-        <div className="absolute inset-0 z-[60] bg-black/50 backdrop-blur-sm flex justify-end">
-          <div className="w-full md:w-2/3 h-full bg-white shadow-2xl relative animate-slide-in-right">
-            <PdfViewerPanel
-              bookId={selectedPdfRef.bookId}
-              page={selectedPdfRef.page}
-              onClose={closePdfViewer}
-            />
-          </div>
-        </div>
+        <PdfViewerPanel
+          bookId={selectedPdfRef.bookId}
+          page={selectedPdfRef.page}
+          onClose={closePdfViewer}
+        />
       )}
       <BookDetailsModal
         isOpen={isDetailsOpen}
